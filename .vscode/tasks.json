@@ -1,0 +1,337 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Check git and GitHub status",
+			"type": "shell",
+			"command": "git",
+			"args": [
+				"--no-pager",
+				"status",
+				"--short",
+				"--branch"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Check project remote and auth",
+			"type": "shell",
+			"command": "powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"Set-Location 'E:\\proj'; git --no-pager remote -v; gh auth status"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Check SSH GitHub access",
+			"type": "shell",
+			"command": "powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"Set-Location 'E:\\proj'; git --no-pager branch --show-current; git --no-pager status --short; ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -T git@github.com"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Authenticate GitHub CLI",
+			"type": "shell",
+			"command": "gh",
+			"args": [
+				"auth",
+				"login",
+				"--hostname",
+				"github.com",
+				"--git-protocol",
+				"ssh",
+				"--web"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Complete GitHub login",
+			"type": "shell",
+			"command": "powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"'y' | gh auth login --hostname github.com --git-protocol ssh --web"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Authenticate GitHub SSH",
+			"type": "shell",
+			"command": "powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"Write-Output 'y' | gh auth login --hostname github.com --git-protocol ssh --web"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Commit and push project",
+			"type": "shell",
+			"command": "powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"Set-Location 'E:\\proj'; gh auth status; git add ai/src; git --no-pager diff --cached --stat; git diff --cached --quiet; if ($LASTEXITCODE -eq 0) { git --no-pager status --short } else { git -c user.name='Copilot' -c user.email='223556219+Copilot@users.noreply.github.com' commit -m 'Update travel project' -m 'Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>'; git push origin main }"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Commit project changes",
+			"type": "shell",
+			"command": "git",
+			"args": [
+				"-C",
+				"E:\\proj",
+				"-c",
+				"user.name=Copilot",
+				"-c",
+				"user.email=223556219+Copilot@users.noreply.github.com",
+				"commit",
+				"-m",
+				"Update travel project",
+				"-m",
+				"Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Stage project source",
+			"type": "shell",
+			"command": "git",
+			"args": [
+				"-C",
+				"E:\\proj",
+				"add",
+				"ai/src"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Create project commit",
+			"type": "shell",
+			"command": "git",
+			"args": [
+				"-C",
+				"E:\\proj",
+				"-c",
+				"user.name=Copilot",
+				"-c",
+				"user.email=223556219+Copilot@users.noreply.github.com",
+				"commit",
+				"-m",
+				"Update travel project",
+				"-m",
+				"Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Push project to GitHub",
+			"type": "shell",
+			"command": "git",
+			"args": [
+				"-C",
+				"E:\\proj",
+				"push",
+				"origin",
+				"main"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Check GitHub auth and key",
+			"type": "shell",
+			"command": "powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"gh auth status; ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -T git@github.com"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Push over authenticated HTTPS",
+			"type": "shell",
+			"command": "powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"gh auth setup-git; git -C 'E:\\proj' remote set-url origin https://github.com/Dhyan-j/travel.git; git -C 'E:\\proj' push origin main"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Rebase and push project",
+			"type": "shell",
+			"command": "powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"git -C 'E:\\proj' pull --rebase origin main; git -C 'E:\\proj' push origin main"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Inspect rebase status",
+			"type": "shell",
+			"command": "git",
+			"args": [
+				"-C",
+				"E:\\proj",
+				"--no-pager",
+				"status",
+				"--short",
+				"--branch"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Resolve rebase conflicts",
+			"type": "shell",
+			"command": "git",
+			"args": [
+				"-C",
+				"E:\\proj",
+				"checkout",
+				"--ours",
+				"index.html",
+				"style.css"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Mark conflict resolution",
+			"type": "shell",
+			"command": "git",
+			"args": [
+				"-C",
+				"E:\\proj",
+				"add",
+				"index.html",
+				"style.css"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Continue rebase",
+			"type": "shell",
+			"command": "powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"$env:GIT_EDITOR='true'; git -C 'E:\\proj' rebase --continue"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Complete rebase",
+			"type": "shell",
+			"command": "git",
+			"args": [
+				"-C",
+				"E:\\proj",
+				"-c",
+				"core.editor=true",
+				"rebase",
+				"--continue"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Push rebased project",
+			"type": "shell",
+			"command": "git",
+			"args": [
+				"-C",
+				"E:\\proj",
+				"push",
+				"origin",
+				"main"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Verify pushed repository",
+			"type": "shell",
+			"command": "git",
+			"args": [
+				"-C",
+				"E:\\proj",
+				"--no-pager",
+				"status",
+				"--short",
+				"--branch",
+				"-uno"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Create and push new project repository",
+			"type": "shell",
+			"command": "powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"Set-Location 'E:\\proj\\ai'; gh repo create 'Dhyan-j/trvel-algo-v2' --public --source . --remote origin-new --push"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Initialize project repository",
+			"type": "shell",
+			"command": "git",
+			"args": [
+				"-C",
+				"E:\\proj\\ai",
+				"init",
+				"-b",
+				"main"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Stage new repository files",
+			"type": "shell",
+			"command": "git",
+			"args": [
+				"-C",
+				"E:\\proj\\ai",
+				"add",
+				"--all"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}
