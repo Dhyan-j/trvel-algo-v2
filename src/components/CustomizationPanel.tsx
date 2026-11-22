@@ -8,6 +8,7 @@ export type ThemeId =
   | 'rose'
   | 'monochrome'
   | 'cyberpunk'
+  | 'edgerunners'
   | 'superman'
   | 'batman'
   | 'spiderman'
@@ -56,6 +57,12 @@ export const THEME_OPTIONS: ThemeOption[] = [
     name: 'Cyberpunk Neon',
     description: 'Electric neon on midnight',
     colors: ['#0b1021', '#00f5d4', '#ff2bd6', '#7b61ff', '#f4f7ff'],
+  },
+  {
+    id: 'edgerunners',
+    name: 'Cyberpunk: Edgerunners',
+    description: 'Night City yellow, chrome red and neon green accents',
+    colors: ['#080a12', '#fcee0a', '#e53935', '#252c55', '#f5f5f2'],
   },
   {
     id: 'superman',

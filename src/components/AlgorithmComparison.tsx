@@ -63,6 +63,8 @@ export const AlgorithmComparison: React.FC<AlgorithmComparisonProps> = ({
   const maxExpandedForRanking = successfulRuns.length > 0
     ? Math.max(...successfulRuns.map((r) => r.result.nodesExpanded))
     : 1;
+  const maxMeasuredTime = Math.max(0, ...results.map(({ result }) => result.executionTimeMs));
+  const maxMeasuredSpace = Math.max(0, ...results.map(({ result }) => result.maxFrontierSize));
 
   const rankedResults = [...results].sort((a, b) => {
     if (a.result.success !== b.result.success) return a.result.success ? -1 : 1;
@@ -108,65 +110,85 @@ export const AlgorithmComparison: React.FC<AlgorithmComparisonProps> = ({
       <div className="rounded-2xl border border-[var(--accent)]/35 bg-[var(--base)]/75 p-5 shadow-[0_16px_40px_rgba(48,0,24,0.07)]">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-sm font-bold text-[var(--text)]">Algorithm Workload Profile</h3>
+            <h3 className="text-sm font-bold text-[var(--text)]">Algorithm Time & Space Comparison</h3>
             <p className="mt-1 text-[11px] text-[var(--secondary)]">
-              Nodes expanded as a measured proxy for search time
+              Measured execution time and peak frontier size for all seven algorithms
             </p>
           </div>
           <span className="text-[10px] px-2 py-1 rounded-full border border-[var(--accent)]/30 bg-[var(--surface)]/25 text-[var(--secondary)]">
-            Dark marker = no path
+            No-path runs are measured too
           </span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {[
-            { label: 'Informed Search', informed: true },
-            { label: 'Uninformed Search', informed: false },
-          ].map((group) => (
-            <div key={group.label} className="rounded-xl border border-[var(--accent)]/20 bg-[var(--surface)]/10 p-3">
-              <h4 className="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--secondary)]">
-                {group.label}
-              </h4>
+            {
+              label: 'Execution time',
+              unit: 'ms',
+              valueFor: (result: typeof results[number]['result']) => result.executionTimeMs,
+              max: maxMeasuredTime,
+              format: (value: number) => `${value.toFixed(3)} ms`,
+              color: 'var(--surface)',
+            },
+            {
+              label: 'Peak space',
+              unit: 'frontier nodes',
+              valueFor: (result: typeof results[number]['result']) => result.maxFrontierSize,
+              max: maxMeasuredSpace,
+              format: (value: number) => `${value} nodes`,
+              color: 'var(--accent)',
+            },
+          ].map((chart) => (
+            <div key={chart.label} className="rounded-xl border border-[var(--accent)]/20 bg-[var(--surface)]/10 p-3">
+              <div className="mb-3 flex items-baseline justify-between gap-2">
+                <h4 className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--secondary)]">
+                  {chart.label}
+                </h4>
+                <span className="text-[9px] text-[var(--muted)]">{chart.unit}</span>
+              </div>
               <div className="space-y-2.5">
-                {results
-                  .filter(({ info }) => info.isHeuristic === group.informed)
-                  .map(({ algoKey, info, result }) => {
-                    const maxExpanded = Math.max(1, ...results.map((item) => item.result.nodesExpanded));
-                    const width = Math.max(2, (result.nodesExpanded / maxExpanded) * 100);
-                    return (
-                      <div key={`profile-${algoKey}`} className="grid grid-cols-[110px_1fr_58px] items-center gap-3">
-                        <span className="truncate text-[11px] font-semibold text-[var(--secondary)]" title={info.name}>
-                          {info.shortName}
-                        </span>
-                        <div className="h-3 rounded-full bg-[var(--text)]/10 overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all duration-500 ${
-                              result.success ? 'bg-[var(--surface)]' : 'bg-[var(--text)]'
-                            }`}
-                            style={{ width: `${width}%` }}
-                          />
-                        </div>
-                        <span className={`text-right font-mono text-[11px] ${result.success ? 'text-[var(--accent)]' : 'text-[var(--text)] font-bold'}`}>
-                          {result.success ? result.nodesExpanded : 'FAIL'}
-                        </span>
+                {results.map(({ algoKey, info, result }) => {
+                  const value = chart.valueFor(result);
+                  const width = chart.max > 0 ? (value / chart.max) * 100 : 0;
+                  return (
+                    <div key={`${chart.label}-${algoKey}`} className="grid grid-cols-[105px_minmax(0,1fr)_72px] items-center gap-2">
+                      <span className="truncate text-[11px] font-semibold text-[var(--secondary)]" title={info.name}>
+                        {info.shortName}
+                      </span>
+                      <div
+                        className="h-3 overflow-hidden rounded-full bg-[var(--text)]/10"
+                        role="progressbar"
+                        aria-label={`${info.name} ${chart.label.toLowerCase()}`}
+                        aria-valuemin={0}
+                        aria-valuemax={Math.max(1, chart.max)}
+                        aria-valuenow={value}
+                      >
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{ width: `${width}%`, backgroundColor: chart.color }}
+                        />
                       </div>
-                    );
-                  })}
+                      <span className="text-right font-mono text-[10px] text-[var(--text)]">
+                        {chart.format(value)}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="rounded-2xl border border-[var(--accent)]/35 bg-[var(--text)] p-5 md:p-6 shadow-[0_18px_45px_rgba(48,0,24,0.16)]">
+      <div className="rounded-2xl border border-[var(--accent)]/35 bg-[var(--secondary)] p-5 md:p-6 shadow-xl">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-3">
           <div>
             <p className="text-[10px] uppercase font-bold tracking-[0.22em] text-[var(--surface)]">Full benchmark</p>
-            <h3 className="mt-1 text-xl font-bold text-[var(--base)]">Algorithm Comparison</h3>
-            <p className="mt-1 text-xs text-[var(--base)]/70">Ranked by execution time 40% · peak space 30% · nodes expanded 30%</p>
+            <h3 className="mt-1 text-xl font-bold text-[var(--on-secondary)]">Algorithm Comparison</h3>
+            <p className="mt-1 text-xs text-[var(--on-secondary)]/70">Ranked by execution time 40% · peak space 30% · nodes expanded 30%</p>
           </div>
           {rankedResults[0]?.result.success && (
             <div className="rounded-xl border border-[var(--success)]/40 bg-[var(--success)]/15 px-4 py-2 text-right">
-              <span className="block text-[9px] uppercase tracking-wider text-[var(--base)]/70">Overall best</span>
+              <span className="block text-[9px] uppercase tracking-wider text-[var(--on-secondary)]/70">Overall best</span>
               <strong className="mt-0.5 block text-sm text-[var(--success)]">
                 {rankedResults[0].info.shortName}
               </strong>
@@ -197,8 +219,8 @@ export const AlgorithmComparison: React.FC<AlgorithmComparisonProps> = ({
           ].map((winner) => (
             <div key={winner.label} className="rounded-xl border border-[var(--base)]/10 bg-[var(--base)]/5 px-4 py-3">
               <div className="text-[9px] uppercase tracking-wider" style={{ color: winner.accent }}>{winner.label}</div>
-              <div className="mt-1 text-sm font-bold text-[var(--base)]">{winner.value || 'N/A'}</div>
-              <div className="mt-0.5 font-mono text-[10px] text-[var(--base)]/60">{winner.detail}</div>
+              <div className="mt-1 text-sm font-bold text-[var(--on-secondary)]">{winner.value || 'N/A'}</div>
+              <div className="mt-0.5 font-mono text-[10px] text-[var(--on-secondary)]/60">{winner.detail}</div>
             </div>
           ))}
         </div>
@@ -216,10 +238,10 @@ export const AlgorithmComparison: React.FC<AlgorithmComparisonProps> = ({
               return (
                 <div key={`benchmark-${algoKey}`} className="grid grid-cols-[126px_minmax(0,1fr)_150px] items-center gap-3">
                   <div className="min-w-0">
-                    <div className="truncate text-xs font-bold text-[var(--base)]" title={info.name}>
+                    <div className="truncate text-xs font-bold text-[var(--on-secondary)]" title={info.name}>
                       {index + 1}. {info.shortName}
                     </div>
-                    <div className="mt-0.5 text-[9px] text-[var(--base)]/55">
+                    <div className="mt-0.5 text-[9px] text-[var(--on-secondary)]/55">
                       {info.isHeuristic ? 'Informed' : 'Uninformed'}
                     </div>
                   </div>
@@ -240,10 +262,10 @@ export const AlgorithmComparison: React.FC<AlgorithmComparisonProps> = ({
                   <div className="text-right text-[9px] leading-relaxed">
                     {result.success ? (
                       <>
-                        <div className="font-mono font-bold text-[var(--base)]">
+                        <div className="font-mono font-bold text-[var(--on-secondary)]">
                           {result.executionTimeMs.toFixed(2)} ms · {result.maxFrontierSize} space
                         </div>
-                        <div className="mt-0.5 font-mono text-[var(--base)]/75">{result.nodesExpanded} nodes</div>
+                        <div className="mt-0.5 font-mono text-[var(--on-secondary)]/75">{result.nodesExpanded} nodes</div>
                         {isBestOverall && <div className="mt-0.5 text-[8px] uppercase text-[var(--success)]">Overall best</div>}
                         {(isBestTime || isBestSpace || isBestNodes) && (
                           <div className="mt-0.5 text-[8px] uppercase text-[var(--accent)]">
@@ -260,7 +282,7 @@ export const AlgorithmComparison: React.FC<AlgorithmComparisonProps> = ({
             })}
         </div>
 
-        <div className="mt-5 flex flex-wrap items-center gap-4 border-t border-[var(--base)]/10 pt-4 text-[9px] text-[var(--base)]/65">
+        <div className="mt-5 flex flex-wrap items-center gap-4 border-t border-[var(--on-secondary)]/10 pt-4 text-[9px] text-[var(--on-secondary)]/65">
           <span className="flex items-center gap-1.5"><i className="h-2 w-2 rounded-full bg-[var(--success)]" />Overall / category winner</span>
           <span className="flex items-center gap-1.5"><i className="h-2 w-2 rounded-full bg-[var(--accent)]" />Lowest cost / category marker</span>
           <span className="flex items-center gap-1.5"><i className="h-2 w-2 rounded-full bg-[var(--surface)]" />Successful run</span>
@@ -412,7 +434,7 @@ export const AlgorithmComparison: React.FC<AlgorithmComparisonProps> = ({
                   <td className="p-3.5 text-right">
                     <button
                       onClick={() => onApplyPathToView(algoKey)}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[var(--secondary)] hover:bg-[var(--success)] text-[var(--base)] font-medium text-xs transition shadow-xs"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[var(--secondary)] hover:bg-[var(--success)] text-[var(--on-secondary)] font-medium text-xs transition shadow-xs"
                     >
                       <span>Visualize</span>
                       <ArrowRight size={13} />

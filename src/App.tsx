@@ -59,28 +59,43 @@ export default function App() {
     root.style.setProperty('--secondary', secondary);
     root.style.setProperty('--text', text);
     root.style.setProperty('--canvas', base);
-    root.style.setProperty('--muted', accent);
+    const darkTheme = ['cyberpunk', 'edgerunners', 'batman', 'sovereign'].includes(theme);
+    root.style.setProperty('--on-secondary', darkTheme ? text : base);
+    const mutedColor =
+      theme === 'cyberpunk'
+        ? '#b6bdd3'
+        : theme === 'edgerunners'
+          ? '#c3c6d1'
+          : theme === 'batman'
+            ? '#c7c9cd'
+            : theme === 'sovereign'
+              ? '#a6ad9f'
+              : accent;
+    root.style.setProperty('--muted', mutedColor);
     const successColor =
       theme === 'cyberpunk'
         ? '#39ff14'
-        : theme === 'monochrome'
-          ? '#4d4d4d'
-          : theme === 'superman'
-            ? '#d5a900'
-            : theme === 'batman'
-              ? '#f2c84b'
-              : theme === 'spiderman'
-                ? '#1853a3'
-                : theme === 'sovereign'
-          ? '#b9a95c'
-          : surface;
+        : theme === 'edgerunners'
+          ? '#57d16f'
+          : theme === 'monochrome'
+            ? '#4d4d4d'
+            : theme === 'superman'
+              ? '#d5a900'
+              : theme === 'batman'
+                ? '#f2c84b'
+                : theme === 'spiderman'
+                  ? '#1853a3'
+                  : theme === 'sovereign'
+                    ? '#b9a95c'
+                    : surface;
     root.style.setProperty('--success', successColor);
     root.style.setProperty('--danger', text);
     root.dataset.theme = theme;
-    document.body.classList.toggle('sovereign-interface', theme === 'sovereign');
     root.style.setProperty(
       'color-scheme',
-      theme === 'cyberpunk' || theme === 'batman' || theme === 'sovereign' ? 'dark' : 'light'
+      theme === 'cyberpunk' || theme === 'edgerunners' || theme === 'batman' || theme === 'sovereign'
+        ? 'dark'
+        : 'light'
     );
     localStorage.setItem('searchcraft-theme', theme);
   }, [theme]);

@@ -602,7 +602,7 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
               y1={edgeStartNode.y}
               x2={mousePos.x}
               y2={mousePos.y}
-              stroke="var(--secondary)"
+              stroke="var(--surface)"
               strokeWidth="2.5"
               strokeDasharray="5,5"
               className="pointer-events-none"
@@ -620,6 +620,7 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
             const isVisited = visitedSet.has(node.id);
             const isInPath = pathSet.has(node.id);
             const frontierData = frontierNodeMap.get(node.id);
+            const labelFill = isCurrentVisiting ? 'var(--text)' : 'var(--base)';
 
             // Styling based on search state
             let fill = 'var(--text)';
@@ -759,7 +760,8 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
                 <text
                   textAnchor="middle"
                   dy={node.h !== undefined ? '-2' : '4'}
-                  className="text-xs font-bold fill-slate-100 pointer-events-none select-none tracking-tight"
+                  className="text-xs font-bold pointer-events-none select-none tracking-tight"
+                  style={{ fill: labelFill }}
                 >
                   {node.label.length > 8 ? `${node.label.slice(0, 7)}…` : node.label}
                 </text>
@@ -769,7 +771,8 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
                   <text
                     textAnchor="middle"
                     dy="13"
-                    className="text-[10px] font-mono font-semibold fill-amber-300 pointer-events-none select-none"
+                    className="text-[10px] font-mono font-semibold pointer-events-none select-none"
+                    style={{ fill: labelFill }}
                   >
                     f={frontierData.f.toFixed(0)}
                   </text>
@@ -777,7 +780,8 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
                   <text
                     textAnchor="middle"
                     dy="13"
-                    className="text-[9.5px] font-mono fill-slate-400 pointer-events-none select-none"
+                    className="text-[9.5px] font-mono pointer-events-none select-none"
+                    style={{ fill: labelFill }}
                   >
                     h={node.h}
                   </text>
